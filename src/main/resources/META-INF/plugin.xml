@@ -3,7 +3,11 @@
     <id>com.llyke.plugin.tools</id>
     <name>ImportBeanField</name>
     <vendor email="2720851545@qq.com" url="https://llyke.lol">llyke</vendor>
+    <description>
+        &lt;p&gt;&lt;strong&gt;ImportBeanField&lt;/strong&gt;  provides the ability to quickly add a Spring bean to the current class.&lt;/p&gt;
 
+        &lt;p&gt;source code url &lt;a href="https://github.com/2720851545/ImportBeanField"&gt;source_repo&lt;/a&gt;&lt;/p&gt;
+    </description>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
