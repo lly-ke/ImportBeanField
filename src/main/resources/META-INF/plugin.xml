@@ -1,0 +1,33 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>com.llyke.plugin.tools</id>
+    <name>ImportBeanField</name>
+    <vendor email="2720851545@qq.com" url="https://llyke.lol">llyke</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.spring</depends>
+
+    <actions>
+        <action id="com.llyke.plugin.tools.action.SearchAction" class="com.llyke.plugin.tools.action.SearchAction"
+                text="导入Bean字段" description="导入Bean字段">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="control shift I"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+    <!--     <searchEverywhereContributor -->
+    <!--             implementation="com.llyke.plugin.tools.action.search.ImportBeanFieldSearchGotoSEContributor$Factory"/> -->
+    <!--     <searchEverywhereResultsEqualityProvider -->
+    <!--             implementation="com.llyke.plugin.tools.action.search.IBFResultsEqualityProvider"/> -->
+    </extensions>
+    <!-- <extensionPoints> -->
+    <!--     <extensionPoint name="importBeanFieldContributor" interface="com.intellij.navigation.ChooseByNameContributor"/> -->
+    <!-- </extensionPoints> -->
+    <!-- <extensions defaultExtensionNs="com.llyke.plugin.tools"> -->
+    <!--     <importBeanFieldContributor implementation="com.llyke.plugin.tools.action.search.ImportBeanFieldContributor"/> -->
+    <!-- </extensions> -->
+
+</idea-plugin>
