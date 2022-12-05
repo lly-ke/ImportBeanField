@@ -8,14 +8,13 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.pom.PomTargetPsiElement
-import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElementFactory
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiType
+import com.intellij.psi.*
+import com.intellij.psi.impl.source.PsiJavaFileImpl
 import com.intellij.psi.targets.AliasingPsiTarget
 import com.intellij.spring.model.jam.JamPsiClassSpringBean
+import com.llyke.plugin.tools.IBFBundle
 import com.llyke.plugin.tools.action.search.ImportBeanFieldModel
+import com.llyke.plugin.tools.util.IBFNotifier
 import com.llyke.plugin.tools.util.IdeaUtil
 
 
@@ -80,7 +79,16 @@ class SearchAction : GotoActionBase() {
 
                 val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
                 val editor = e.getData(CommonDataKeys.EDITOR) ?: return
-                val targetClass: PsiClass = IdeaUtil.getTargetClass(editor, psiFile) ?: return
+                val targetClass: PsiClass = IdeaUtil.getTargetClassByCursor(editor, psiFile) ?: let {
+                    // 当前光标找不到并且当前文件只有一个类, 就用当前文件唯一的类
+                    val classes = (e.getData(CommonDataKeys.PSI_FILE) as PsiJavaFileImpl).classes
+                    if (classes.size == 1) {
+                        classes[0]
+                    } else {
+                        IBFNotifier.notifyError(e.project ?: return, IBFBundle.getMessage("ibf.notifier.error.noClass"))
+                        return
+                    }
+                }
                 val project = e.project ?: return
                 LOG.info("写入目标类：${targetClass.qualifiedName}")
 

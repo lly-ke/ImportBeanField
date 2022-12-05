@@ -1,7 +1,6 @@
 package com.llyke.plugin.tools.util
 
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.NlsSafe
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -22,7 +21,8 @@ class IdeaUtil {
             return String(chars)
         }
 
-        fun getTargetClass(editor: Editor, file: PsiFile): PsiClass? {
+
+        fun getTargetClassByCursor(editor: Editor, file: PsiFile): PsiClass? {
             val element: PsiElement = file.findElementAt(editor.caretModel.offset) ?: return null
             val target: PsiClass? = PsiTreeUtil.getParentOfType(element, PsiClass::class.java)
             return if (target is SyntheticElement) null else target
