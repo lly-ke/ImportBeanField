@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [2022.12.5]
+
+### Changed
+- 优化搜索
+
 ## [2022.12.2]
 
 ### Added
@@ -11,5 +16,5 @@
 - 完成基本搜索功能
 - 完成基本类Java字段添加功能
 
-[Unreleased]: https://github.com/JetBrains/intellij-platform-plugin-template/compare/v2022.12.2...HEAD
+[Unreleased]: https://github.com/2720851545/ImportBeanField
 [2022.12.2]: https://github.com/2720851545/ImportBeanField

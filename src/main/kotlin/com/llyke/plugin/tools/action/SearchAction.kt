@@ -11,6 +11,8 @@ import com.intellij.pom.PomTargetPsiElement
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElementFactory
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiType
 import com.intellij.psi.targets.AliasingPsiTarget
 import com.intellij.spring.model.jam.JamPsiClassSpringBean
 import com.llyke.plugin.tools.action.search.ImportBeanFieldModel
@@ -23,7 +25,9 @@ import com.llyke.plugin.tools.util.IdeaUtil
  */
 class SearchAction : GotoActionBase() {
 
-    val LOG = logger<SearchAction>()
+    companion object {
+        val LOG = logger<SearchAction>()
+    }
 
     override fun gotoActionPerformed(e: AnActionEvent) {
         val model = ImportBeanFieldModel(e.project ?: return)
@@ -33,6 +37,10 @@ class SearchAction : GotoActionBase() {
                 when (o) {
                     is PsiClass -> {
                         writeField(o, o.name!!, e)
+                    }
+
+                    is PsiMethod -> {
+                        writeField(o.returnType ?: return, o.name ?: return, e)
                     }
 
                     is PomTargetPsiElement -> {
@@ -65,6 +73,11 @@ class SearchAction : GotoActionBase() {
             }
 
             private fun writeField(psiClass: PsiClass, name: String, e: AnActionEvent) {
+                writeField(JavaPsiFacade.getInstance(e.project ?: return).elementFactory.createType(psiClass), name, e)
+            }
+
+            private fun writeField(psiType: PsiType, name: String, e: AnActionEvent) {
+
                 val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
                 val editor = e.getData(CommonDataKeys.EDITOR) ?: return
                 val targetClass: PsiClass = IdeaUtil.getTargetClass(editor, psiFile) ?: return
@@ -73,12 +86,12 @@ class SearchAction : GotoActionBase() {
 
                 val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
 
-        //        val search: Query<PsiClass> =
-        //            AllClassesSearch.search(GlobalSearchScope.allScope(targetClass.project), targetClass.project)
-        //        val psiClass = search.findFirst() ?: return
-        //        val name = psiClass.name ?: return
+                //        val search: Query<PsiClass> =
+                //            AllClassesSearch.search(GlobalSearchScope.allScope(targetClass.project), targetClass.project)
+                //        val psiClass = search.findFirst() ?: return
+                //        val name = psiClass.name ?: return
                 val psiField = psiElementFactory.createField(
-                    IdeaUtil.toCamelCase(name), JavaPsiFacade.getInstance(project).elementFactory.createType(psiClass)
+                    IdeaUtil.toCamelCase(name), transformPsiType(psiType)
                 )
                 val modifierList = psiField.modifierList ?: return
                 modifierList.addAnnotation("Autowired")
@@ -86,6 +99,11 @@ class SearchAction : GotoActionBase() {
                 WriteCommandAction.runWriteCommandAction(e.project) {
                     targetClass.add(psiField)
                 }
+            }
+
+            private fun transformPsiType(psiType: PsiType): PsiType {
+
+                return psiType
             }
 
         })

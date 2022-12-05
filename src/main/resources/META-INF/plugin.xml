@@ -27,11 +27,11 @@
     <!--     <searchEverywhereResultsEqualityProvider -->
     <!--             implementation="com.llyke.plugin.tools.action.search.IBFResultsEqualityProvider"/> -->
     </extensions>
-    <!-- <extensionPoints> -->
-    <!--     <extensionPoint name="importBeanFieldContributor" interface="com.intellij.navigation.ChooseByNameContributor"/> -->
-    <!-- </extensionPoints> -->
-    <!-- <extensions defaultExtensionNs="com.llyke.plugin.tools"> -->
-    <!--     <importBeanFieldContributor implementation="com.llyke.plugin.tools.action.search.ImportBeanFieldContributor"/> -->
-    <!-- </extensions> -->
+<!--     <extensionPoints>-->
+<!--         <extensionPoint name="IBFContributor" interface="com.intellij.navigation.ChooseByNameContributor" dynamic="true"/>-->
+<!--     </extensionPoints>-->
+<!--     <extensions defaultExtensionNs="com.llyke.plugin.tools">-->
+<!--         <IBFContributor implementation="com.llyke.plugin.tools.action.search.IBFContributorProvider"/>-->
+<!--     </extensions>-->
 
 </idea-plugin>
