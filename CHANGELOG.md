@@ -16,5 +16,6 @@
 - 完成基本搜索功能
 - 完成基本类Java字段添加功能
 
-[Unreleased]: https://github.com/2720851545/ImportBeanField
-[2022.12.2]: https://github.com/2720851545/ImportBeanField
+[Unreleased]: https://github.com/2720851545/ImportBeanField/compare/v2022.12.5...HEAD
+[2022.12.5]: https://github.com/2720851545/ImportBeanField/commits/v2022.12.5
+[2022.12.2]: https://github.com/2720851545/ImportBeanField/compare/v2022.12.5...v2022.12.2
