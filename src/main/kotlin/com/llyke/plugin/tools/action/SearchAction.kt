@@ -35,28 +35,25 @@ class SearchAction : GotoActionBase() {
                 LOG.info("选择的元素是：$o")
                 when (o) {
                     is PsiClass -> {
-                        writeField(o, o.name!!, e)
+                        writeField(o, e)
                     }
 
                     is PsiMethod -> {
-                        writeField(o.returnType ?: return, o.name ?: return, e)
+                        writeField(o.returnType as? PsiClassType ?: return, e)
                     }
 
                     is PomTargetPsiElement -> {
                         when (val target = o.target) {
                             is JamPomTarget -> { // bean别名
-                                val name = target.name
                                 val jamElement = target.jamElement as? JamPsiClassSpringBean ?: return
-//                                val jamElement: SpringService = target.jamElement as? SpringService ?: return
                                 val psiClass = jamElement.psiElement
 
-                                writeField(psiClass, name, e)
+                                writeField(psiClass, e)
                             }
 
                             is AliasingPsiTarget -> {
-                                val name = target.name
                                 val psiClass = target.navigationElement as? PsiClass ?: return
-                                writeField(psiClass, name, e)
+                                writeField(psiClass, e)
                             }
 
                             else -> {
@@ -71,12 +68,11 @@ class SearchAction : GotoActionBase() {
                 }
             }
 
-            private fun writeField(psiClass: PsiClass, name: String, e: AnActionEvent) {
-                writeField(JavaPsiFacade.getInstance(e.project ?: return).elementFactory.createType(psiClass), name, e)
+            private fun writeField(psiClass: PsiClass, e: AnActionEvent) {
+                writeField(JavaPsiFacade.getInstance(e.project ?: return).elementFactory.createType(psiClass), e)
             }
 
-            private fun writeField(psiType: PsiType, name: String, e: AnActionEvent) {
-
+            private fun writeField(psiType: PsiClassType, e: AnActionEvent) {
                 val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
                 val editor = e.getData(CommonDataKeys.EDITOR) ?: return
                 val targetClass: PsiClass = IdeaUtil.getTargetClassByCursor(editor, psiFile) ?: let {
@@ -90,16 +86,13 @@ class SearchAction : GotoActionBase() {
                     }
                 }
                 val project = e.project ?: return
-                LOG.info("写入目标类：${targetClass.qualifiedName}")
+                LOG.info("需要注入的目标类：${targetClass.qualifiedName}")
 
                 val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
 
-                //        val search: Query<PsiClass> =
-                //            AllClassesSearch.search(GlobalSearchScope.allScope(targetClass.project), targetClass.project)
-                //        val psiClass = search.findFirst() ?: return
-                //        val name = psiClass.name ?: return
+                val transformPsiType = transformPsiType(psiType)
                 val psiField = psiElementFactory.createField(
-                    IdeaUtil.toCamelCase(name), transformPsiType(psiType)
+                    IdeaUtil.toCamelCase(transformPsiType.name), transformPsiType
                 )
                 val modifierList = psiField.modifierList ?: return
                 modifierList.addAnnotation("Autowired")
@@ -109,9 +102,22 @@ class SearchAction : GotoActionBase() {
                 }
             }
 
-            private fun transformPsiType(psiType: PsiType): PsiType {
-
-                return psiType
+            /**
+             * 转换成真正注入的类型, 比如UserServiceImpl -> UserService
+             */
+            private fun transformPsiType(paramPisType: PsiClassType): PsiClassType {
+                val psiClass = paramPisType.resolve() ?: return paramPisType
+                val list = psiClass.interfaces.filter {
+                    // java 内部包直接过滤
+                    !(it.qualifiedName?.startsWith("java") ?: true)
+                }
+                // 只有一个接口直接用接口来注入
+                if (list.size == 1) {
+                    return JavaPsiFacade.getInstance(
+                        e.project ?: return paramPisType
+                    ).elementFactory.createType(list[0])
+                }
+                return paramPisType
             }
 
         })
