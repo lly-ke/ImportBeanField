@@ -7,6 +7,12 @@
 
 源代码网址 [source_repo]
 
+## 快捷键
+
+Mac: `command + shift + i`
+
+Windows: `ctrl + shift + o`
+
 [source_repo]: https://github.com/2720851545/ImportBeanField
 <!-- Plugin description end -->
 

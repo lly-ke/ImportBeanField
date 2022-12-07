@@ -16,6 +16,7 @@ import com.llyke.plugin.tools.IBFBundle
 import com.llyke.plugin.tools.action.search.ImportBeanFieldModel
 import com.llyke.plugin.tools.util.IBFNotifier
 import com.llyke.plugin.tools.util.IdeaUtil
+import org.jetbrains.kotlin.psi.KtClassOrObject
 
 
 /**
@@ -28,18 +29,28 @@ class SearchAction : GotoActionBase() {
         val LOG = logger<SearchAction>()
     }
 
+    override fun update(event: AnActionEvent) {
+        super.update(event)
+    }
+
     override fun gotoActionPerformed(e: AnActionEvent) {
+
+        if (detectionWriteTargetClass(e) == null) {
+            // myInAction = null必须要调用, 负责会导致插件不可用
+            myInAction = null
+            return
+        }
         val model = ImportBeanFieldModel(e.project ?: return)
         showNavigationPopup(e, model, object : GotoActionCallback<Any>() {
             override fun elementChosen(chooseByNamePopup: ChooseByNamePopup, o: Any) {
                 LOG.info("选择的元素是：$o")
                 when (o) {
                     is PsiClass -> {
-                        writeField(o, e)
+                        writeToJavaField(o, e)
                     }
 
                     is PsiMethod -> {
-                        writeField(o.returnType as? PsiClassType ?: return, e)
+                        writeToJavaField(o.returnType as? PsiClassType ?: return, e)
                     }
 
                     is PomTargetPsiElement -> {
@@ -48,12 +59,23 @@ class SearchAction : GotoActionBase() {
                                 val jamElement = target.jamElement as? JamPsiClassSpringBean ?: return
                                 val psiClass = jamElement.psiElement
 
-                                writeField(psiClass, e)
+                                writeToJavaField(psiClass, e)
                             }
 
                             is AliasingPsiTarget -> {
-                                val psiClass = target.navigationElement as? PsiClass ?: return
-                                writeField(psiClass, e)
+                                when (val navigationElement = target.navigationElement) {
+                                    is PsiClass -> {
+                                        writeToJavaField(navigationElement, e)
+                                    }
+
+                                    is KtClassOrObject -> {
+                                        writeToJavaField(navigationElement, e)
+                                    }
+
+                                    else -> {
+                                        LOG.info("未知的类型：$navigationElement")
+                                    }
+                                }
                             }
 
                             else -> {
@@ -68,38 +90,59 @@ class SearchAction : GotoActionBase() {
                 }
             }
 
-            private fun writeField(psiClass: PsiClass, e: AnActionEvent) {
-                writeField(JavaPsiFacade.getInstance(e.project ?: return).elementFactory.createType(psiClass), e)
+            private fun writeToJavaField(psiClass: PsiClass, e: AnActionEvent) {
+                writeToJavaField(JavaPsiFacade.getInstance(e.project ?: return).elementFactory.createType(psiClass), e)
             }
 
-            private fun writeField(psiType: PsiClassType, e: AnActionEvent) {
-                val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return
-                val editor = e.getData(CommonDataKeys.EDITOR) ?: return
-                val targetClass: PsiClass = IdeaUtil.getTargetClassByCursor(editor, psiFile) ?: let {
-                    // 当前光标找不到并且当前文件只有一个类, 就用当前文件唯一的类
-                    val classes = (e.getData(CommonDataKeys.PSI_FILE) as PsiJavaFileImpl).classes
-                    if (classes.size == 1) {
-                        classes[0]
-                    } else {
-                        IBFNotifier.notifyError(e.project ?: return, IBFBundle.getMessage("ibf.notifier.error.noClass"))
-                        return
+            private fun writeToJavaField(psiType: Any, e: AnActionEvent) {
+                val detectionWriteTargetClass = detectionWriteTargetClass(e) ?: return
+                val project = e.project ?: return
+                LOG.info("需要注入的目标类：${detectionWriteTargetClass.qualifiedName}")
+
+                when (psiType) {
+                    // 源bean是java类
+                    is PsiClassType -> {
+                        val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
+                        val transformPsiType = transformPsiType(psiType)
+                        val psiField = psiElementFactory.createField(
+                            IdeaUtil.toCamelCase(transformPsiType.name), transformPsiType
+                        )
+                        val modifierList = psiField.modifierList ?: return
+                        modifierList.addAnnotation("Autowired")
+
+                        WriteCommandAction.runWriteCommandAction(e.project) {
+                            detectionWriteTargetClass.add(psiField)
+                        }
+                    }
+
+                    // 源bean是kotlin类
+                    is KtClassOrObject -> {
+
+                        val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
+                        val transformPsiType = transformPsiType(psiType)
+                        val psiField = psiElementFactory.createFieldFromText(
+                            "private ${transformPsiType.name} ${
+                                IdeaUtil.toCamelCase(transformPsiType.name!!)
+                            };", detectionWriteTargetClass
+                        )
+                        val modifierList = psiField.modifierList ?: return
+                        modifierList.addAnnotation("Autowired")
+
+                        WriteCommandAction.runWriteCommandAction(e.project) {
+                            detectionWriteTargetClass.add(psiField)
+                        }
+//                        val transformPsiType = transformPsiType(psiType)
+//                        val ktPsiFactory = KtPsiFactory(project)
+//                        val ktProperty =
+//                            ktPsiFactory.createProperty(IdeaUtil.toCamelCase(transformPsiType.name!!))
+//
+//                        ktProperty.addAnnotationEntry(ktPsiFactory.createAnnotationEntry("@Autowired"))
+//                        WriteCommandAction.runWriteCommandAction(e.project) {
+//                            targetClass.add(ktProperty)
+//                        }
                     }
                 }
-                val project = e.project ?: return
-                LOG.info("需要注入的目标类：${targetClass.qualifiedName}")
 
-                val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
-
-                val transformPsiType = transformPsiType(psiType)
-                val psiField = psiElementFactory.createField(
-                    IdeaUtil.toCamelCase(transformPsiType.name), transformPsiType
-                )
-                val modifierList = psiField.modifierList ?: return
-                modifierList.addAnnotation("Autowired")
-
-                WriteCommandAction.runWriteCommandAction(e.project) {
-                    targetClass.add(psiField)
-                }
             }
 
             /**
@@ -120,7 +163,41 @@ class SearchAction : GotoActionBase() {
                 return paramPisType
             }
 
+            private fun transformPsiType(paramPisType: KtClassOrObject): KtClassOrObject {
+                // TODO 后期支持kotlin transformPsiType, 相关api暂时还没找到
+                return paramPisType
+            }
+
         })
+    }
+
+    private fun detectionWriteTargetClass(
+        e: AnActionEvent
+    ): PsiClass? {
+        val res = detectionWriteTargetClassInner(e)
+        if (res == null) {
+            LOG.info("请将光标移动到正确的位置, 检测不到写入目标文件")
+            IBFNotifier.notifyInformation(e.project ?: return null, IBFBundle.getMessage("ibf.notifier.error.noClass"))
+        }
+        return res
+    }
+
+    private fun detectionWriteTargetClassInner(
+        e: AnActionEvent
+    ): PsiClass? {
+        val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return null
+        val editor = e.getData(CommonDataKeys.EDITOR) ?: return null
+        val targetClass: PsiClass = IdeaUtil.getTargetClassByCursor(editor, psiFile) ?: let {
+            // 当前光标找不到并且当前文件只有一个类, 就用当前文件唯一的类
+            val psiJavaFile = e.getData(CommonDataKeys.PSI_FILE) as? PsiJavaFileImpl ?: return null
+            val classes = psiJavaFile.classes
+            if (classes.size == 1) {
+                classes[0]
+            } else {
+                return null
+            }
+        }
+        return targetClass
     }
 
 }

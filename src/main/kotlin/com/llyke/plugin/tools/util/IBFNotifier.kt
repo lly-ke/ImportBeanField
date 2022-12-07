@@ -32,6 +32,16 @@ class IBFNotifier {
                 .createNotification(content, NotificationType.WARNING)
                 .notify(project)
         }
+
+        fun notifyInformation(
+            project: Project?,
+            content: String
+        ) {
+            NotificationGroupManager.getInstance()
+                .getNotificationGroup(IBFConstant.NOTIFICATION_GROUP_ID)
+                .createNotification(content, NotificationType.INFORMATION)
+                .notify(project)
+        }
     }
 
 }

@@ -12,7 +12,10 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.ultimate</depends>
     <depends>com.intellij.spring</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
 
     <actions>
         <action id="com.llyke.plugin.tools.action.SearchAction" class="com.llyke.plugin.tools.action.SearchAction"
@@ -20,7 +23,9 @@
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="control shift I"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="control shift O"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift I" replace-all="true"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift I" replace-all="true"/>
         </action>
     </actions>
 
