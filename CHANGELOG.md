@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [2022.12.7]
+
+### Changed
+- 优化操作, 支持kotlin bean
+
 ## [2022.12.6]
 
 ### Changed
@@ -21,7 +26,8 @@
 - 完成基本搜索功能
 - 完成基本类Java字段添加功能
 
-[Unreleased]: https://github.com/2720851545/ImportBeanField/compare/v2022.12.6...HEAD
+[Unreleased]: https://github.com/2720851545/ImportBeanField/compare/v2022.12.7...HEAD
+[2022.12.7]: https://github.com/2720851545/ImportBeanField/commits/v2022.12.5
 [2022.12.6]: https://github.com/2720851545/ImportBeanField/commits/v2022.12.5
 [2022.12.5]: https://github.com/2720851545/ImportBeanField/commits/v2022.12.5
 [2022.12.2]: https://github.com/2720851545/ImportBeanField/compare/v2022.12.5...v2022.12.2
