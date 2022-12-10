@@ -94,6 +94,14 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
             is PsiClassType -> {
                 val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
                 val transformPsiType = transformPsiType(psiType)
+
+                if (detectionWriteTargetClass.fields.any {
+                        it.type == transformPsiType
+                    } && !RepetitionFieldDialogWrapper(transformPsiType, detectionWriteTargetClass).showAndGet()) {
+                    LOG.info("已存在相同类型的字段，且用户选择不添加")
+                    return
+                }
+
                 val psiField = psiElementFactory.createField(
                     IdeaUtil.toCamelCase(transformPsiType.name), transformPsiType
                 )
