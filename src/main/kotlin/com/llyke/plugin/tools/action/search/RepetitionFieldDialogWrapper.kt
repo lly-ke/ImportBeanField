@@ -30,7 +30,7 @@ class RepetitionFieldDialogWrapper(
         val dialogPanel = JPanel(BorderLayout())
 
         val label =
-            JLabel("当前${detectionWriteTargetClass.name}类中已经存在${psiClassType.name}类型的字段, 确认添加吗?")
+            JLabel("当前 ${detectionWriteTargetClass.name} 类中已经存在 ${psiClassType.name} 类型的字段, 确认添加吗?")
         dialogPanel.add(label, BorderLayout.CENTER)
 
         return dialogPanel
