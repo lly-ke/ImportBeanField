@@ -14,8 +14,11 @@ import com.intellij.psi.targets.AliasingPsiTarget
 import com.intellij.psi.util.JavaElementKind
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.spring.model.jam.JamPsiClassSpringBean
+import com.intellij.util.Consumer
 import com.intellij.util.alsoIfNull
 import com.llyke.plugin.tools.IBFBundle
+import com.llyke.plugin.tools.dialog.search.RepetitionFieldDialogWrapper
+import com.llyke.plugin.tools.setting.IBFSetting
 import com.llyke.plugin.tools.util.IBFNotifier
 import com.llyke.plugin.tools.util.IdeaUtil
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -27,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
  */
 class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
+    private val ibfSetting = IBFSetting.getInstance()
 
     companion object {
         val LOG = logger<IBFGotoActionCallBackWriter>()
@@ -106,12 +110,45 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                     IdeaUtil.toCamelCase(transformPsiType.name), transformPsiType
                 )
                 val modifierList = psiField.modifierList ?: return
-                modifierList.addAnnotation("Autowired")
+                when (ibfSetting.injectMode) {
+                    0 -> {
 
-                writePackageToJavaFile(detectionWriteTargetClass)
-                WriteCommandAction.runWriteCommandAction(e.project) {
-                    detectionWriteTargetClass.add(psiField)
+                        // 字段注解注入
+                        when (ibfSetting.fieldInjectMode) {
+                            0 -> {
+                                modifierList.addAnnotation("Autowired")
+                                val writePackageToJavaFileConsumer = parsePackageToJavaFile(
+                                    detectionWriteTargetClass,
+                                    "org.springframework.beans.factory.annotation.Autowired"
+                                )
+                                WriteCommandAction.runWriteCommandAction(e.project) {
+                                    writePackageToJavaFileConsumer?.consume(null)
+                                    detectionWriteTargetClass.add(psiField)
+                                }
+                            }
+
+                            1 -> {
+                                modifierList.addAnnotation("Resource")
+                                val writePackageToJavaFileConsumer = parsePackageToJavaFile(
+                                    detectionWriteTargetClass,
+                                    // "jakarta.annotation.Resource"
+                                    "javax.annotation.Resource"
+                                )
+                                WriteCommandAction.runWriteCommandAction(e.project) {
+                                    writePackageToJavaFileConsumer?.consume(null)
+                                    detectionWriteTargetClass.add(psiField)
+                                }
+                            }
+
+                        }
+
+                    }
+
+                    1 -> {
+
+                    }
                 }
+
             }
 
             // 源bean是kotlin类
@@ -128,6 +165,10 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                 modifierList.addAnnotation("Autowired")
 
                 WriteCommandAction.runWriteCommandAction(e.project) {
+                    parsePackageToJavaFile(
+                        detectionWriteTargetClass,
+                        "org.springframework.beans.factory.annotation.Autowired"
+                    )
                     detectionWriteTargetClass.add(psiField)
                 }
 //                        val transformPsiType = transformPsiType(psiType)
@@ -144,32 +185,37 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
     }
 
-    private fun writePackageToJavaFile(detectionWriteTargetClass: PsiClass) {
+    private fun parsePackageToJavaFile(detectionWriteTargetClass: PsiClass, annotationName: String): Consumer<Void>? {
         val psiImportListArray =
-            PsiTreeUtil.getChildrenOfType(detectionWriteTargetClass.containingFile, PsiImportList::class.java) ?: return
+            PsiTreeUtil.getChildrenOfType(detectionWriteTargetClass.containingFile, PsiImportList::class.java)
+                ?: return null
         // 正常来说数组只会有一个元素
         for (psiImportList in psiImportListArray) {
             var psiImportStatement =
-                psiImportList.findSingleClassImportStatement("org.springframework.beans.factory.annotation.Autowired")
+                psiImportList.findSingleClassImportStatement(annotationName)
             psiImportStatement.alsoIfNull {
                 psiImportStatement =
-                    psiImportList.findOnDemandImportStatement("org.springframework.beans.factory.annotation")
+                    psiImportList.findOnDemandImportStatement(annotationName.substringBefore(".", annotationName))
             }
             if (psiImportStatement == null) {
-                WriteCommandAction.runWriteCommandAction(detectionWriteTargetClass.project) {
-                    psiImportList.add(
-                        JavaPsiFacade.getElementFactory(detectionWriteTargetClass.project)
-                            .createImportStatement(
-                                JavaPsiFacade.getInstance(detectionWriteTargetClass.project)
-                                    .findClass(
-                                        "org.springframework.beans.factory.annotation.Autowired",
-                                        GlobalSearchScope.allScope(detectionWriteTargetClass.project)
-                                    ) ?: return@runWriteCommandAction
-                            )
-                    )
+                return object : Consumer<Void> {
+                    override fun consume(t: Void?) {
+                        psiImportList.add(
+                            JavaPsiFacade.getElementFactory(detectionWriteTargetClass.project)
+                                .createImportStatement(
+                                    JavaPsiFacade.getInstance(detectionWriteTargetClass.project)
+                                        .findClass(
+                                            annotationName,
+                                            GlobalSearchScope.allScope(detectionWriteTargetClass.project)
+                                        ) ?: return
+                                )
+                        )
+
+                    }
                 }
             }
         }
+        return null
     }
 
     /**

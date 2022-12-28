@@ -1,12 +1,9 @@
-package com.llyke.plugin.tools.action.search
+package com.llyke.plugin.tools.dialog.search
 
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import java.awt.BorderLayout
-import java.awt.event.ActionEvent
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -41,14 +38,6 @@ class RepetitionFieldDialogWrapper(
         val okAction = DialogWrapperExitAction("确定", OK_EXIT_CODE).also {
             it.putValue(DEFAULT_ACTION, true)
         }
-        // 监听回车确定
-        addKeyListener(object : KeyAdapter() {
-            override fun keyTyped(e: KeyEvent) {
-                if (e.keyCode == KeyEvent.VK_ENTER) {
-                    okAction.actionPerformed(ActionEvent(this, 0, "确定"))
-                }
-            }
-        })
         return arrayOf(exitAction, okAction)
     }
 }

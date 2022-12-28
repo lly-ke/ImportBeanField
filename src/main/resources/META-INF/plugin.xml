@@ -30,6 +30,7 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="com.llyke.plugin.tools.setting.IBFSetting"/>
         <notificationGroup displayType="BALLOON" id="ImportBeanField" icon="/icons/IBF.svg" isLogByDefault="true"/>
         <!--     <searchEverywhereContributor -->
         <!--             implementation="com.llyke.plugin.tools.action.search.ImportBeanFieldSearchGotoSEContributor$Factory"/> -->
