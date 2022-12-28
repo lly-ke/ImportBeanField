@@ -107,7 +107,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                 }
 
                 val psiField = psiElementFactory.createField(
-                    IdeaUtil.toCamelCase(transformPsiType.name), transformPsiType
+                    transformFieldName(transformPsiType.name), transformPsiType
                 )
                 val modifierList = psiField.modifierList ?: return
                 when (ibfSetting.injectMode) {
@@ -117,7 +117,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                         when (ibfSetting.fieldInjectMode) {
                             0 -> {
                                 modifierList.addAnnotation("Autowired")
-                                val writePackageToJavaFileConsumer = parsePackageToJavaFile(
+                                val writePackageToJavaFileConsumer = parseAddPackageToJavaFile(
                                     detectionWriteTargetClass,
                                     "org.springframework.beans.factory.annotation.Autowired"
                                 )
@@ -127,12 +127,13 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                                 }
                             }
 
-                            1 -> {
+                            1, 2 -> {
                                 modifierList.addAnnotation("Resource")
-                                val writePackageToJavaFileConsumer = parsePackageToJavaFile(
+                                val annotationName =
+                                    if (ibfSetting.fieldInjectMode == 1) "javax.annotation.Resource" else "jakarta.annotation.Resource"
+                                val writePackageToJavaFileConsumer = parseAddPackageToJavaFile(
                                     detectionWriteTargetClass,
-                                    // "jakarta.annotation.Resource"
-                                    "javax.annotation.Resource"
+                                    annotationName
                                 )
                                 WriteCommandAction.runWriteCommandAction(e.project) {
                                     writePackageToJavaFileConsumer?.consume(null)
@@ -145,7 +146,15 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                     }
 
                     1 -> {
-
+                        // Lombok构造函数注入
+                        psiField.modifierList?.setModifierProperty(PsiModifier.PRIVATE, true)
+                        psiField.modifierList?.setModifierProperty(PsiModifier.FINAL, true)
+                        val addAnnotationToClassConsumer =
+                            parseAddAnnotationToClass(detectionWriteTargetClass, "lombok.RequiredArgsConstructor")
+                        WriteCommandAction.runWriteCommandAction(e.project) {
+                            addAnnotationToClassConsumer?.consume(null)
+                            detectionWriteTargetClass.add(psiField)
+                        }
                     }
                 }
 
@@ -165,7 +174,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                 modifierList.addAnnotation("Autowired")
 
                 WriteCommandAction.runWriteCommandAction(e.project) {
-                    parsePackageToJavaFile(
+                    parseAddPackageToJavaFile(
                         detectionWriteTargetClass,
                         "org.springframework.beans.factory.annotation.Autowired"
                     )
@@ -185,7 +194,39 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
     }
 
-    private fun parsePackageToJavaFile(detectionWriteTargetClass: PsiClass, annotationName: String): Consumer<Void>? {
+    private fun transformFieldName(name: String): String {
+        // IUserService -> userService
+        if (name.length >= 2 && name[0] == 'I' && name[1].isUpperCase()) {
+            return IdeaUtil.toCamelCase(name.substring(1))
+        }
+
+        return IdeaUtil.toCamelCase(name)
+    }
+
+    private fun parseAddAnnotationToClass(
+        detectionWriteTargetClass: PsiClass,
+        annotationName: String
+    ): Consumer<Void>? {
+        val annotation = detectionWriteTargetClass.modifierList?.annotations?.find {
+            it.qualifiedName == annotationName
+        }
+        if (annotation == null) {
+            val addPackageToJavaFileConsumer = parseAddPackageToJavaFile(
+                detectionWriteTargetClass,
+                "lombok.RequiredArgsConstructor"
+            )
+            return Consumer<Void> {
+                addPackageToJavaFileConsumer?.consume(null)
+                detectionWriteTargetClass.modifierList?.addAnnotation(annotationName)
+            }
+        }
+        return null
+    }
+
+    private fun parseAddPackageToJavaFile(
+        detectionWriteTargetClass: PsiClass,
+        annotationName: String
+    ): Consumer<Void>? {
         val psiImportListArray =
             PsiTreeUtil.getChildrenOfType(detectionWriteTargetClass.containingFile, PsiImportList::class.java)
                 ?: return null
