@@ -9,9 +9,17 @@
 
 ## 快捷键
 
+### 打开选择Bean搜索框快捷键
+
 Mac: `command + shift + i`
 
 Windows: `ctrl + shift + o`
+
+### 注入方式调整快捷键(仅在搜索框打开时有效)
+
+Mac: `option + enter`
+
+Windows: `alt + enter`
 
 [source_repo]: https://github.com/2720851545/ImportBeanField
 <!-- Plugin description end -->
@@ -20,7 +28,7 @@ Windows: `ctrl + shift + o`
 
 - 插件市场安装: [安装地址]
 
-- 压缩包下载 
+- 压缩包下载
 
   链接: https://pan.baidu.com/s/10cwt1_qduKwFpE5_6dMGYA 提取码: crst
 
