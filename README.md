@@ -33,3 +33,9 @@ Windows: `alt + enter`
   链接: https://pan.baidu.com/s/10cwt1_qduKwFpE5_6dMGYA 提取码: crst
 
 [安装地址]: https://plugins.jetbrains.com/plugin/20563-importbeanfield
+
+## 讨论 📖
+
+- Discord: [加入Discord]
+
+[加入Discord]: https://discord.com/invite/ywjh4dRRvK
