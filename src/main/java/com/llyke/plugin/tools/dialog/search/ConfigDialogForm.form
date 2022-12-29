@@ -102,6 +102,7 @@
     <group name="fieldInjectGroup" bound="true">
       <member id="daa06"/>
       <member id="8db98"/>
+      <member id="e4054"/>
     </group>
   </buttonGroups>
 </form>

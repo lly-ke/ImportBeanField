@@ -15,7 +15,7 @@ Mac: `command + shift + i`
 
 Windows: `ctrl + shift + o`
 
-### 注入方式调整快捷键(仅在搜索框打开时有效)
+### 打开注入设置快捷键(仅在选中Bean搜索框时能打开)
 
 Mac: `option + enter`
 
