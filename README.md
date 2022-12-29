@@ -5,9 +5,11 @@
 <!-- Plugin description -->
 **ImportBeanField** 提供了快速添加Spring Bean到当前类中的功能。
 
-源代码网址 [source_repo]
+源代码网址 [source_repo] 
 
-## 快捷键
+- 🎥 [演示视频] 
+
+## 快捷键 
 
 ### 打开选择Bean搜索框快捷键
 
@@ -21,21 +23,29 @@ Mac: `option + enter`
 
 Windows: `alt + enter`
 
-[source_repo]: https://github.com/2720851545/ImportBeanField
-<!-- Plugin description end -->
-
-## Installation ⏳
-
-- 插件市场安装: [安装地址]
-
-- 压缩包下载
-
-  链接: https://pan.baidu.com/s/10cwt1_qduKwFpE5_6dMGYA 提取码: crst
-
-[安装地址]: https://plugins.jetbrains.com/plugin/20563-importbeanfield
 
 ## 讨论 📖
 
 - Discord: [加入Discord]
 
 [加入Discord]: https://discord.com/invite/ywjh4dRRvK
+
+[source_repo]: https://github.com/2720851545/ImportBeanField
+[演示视频]: https://www.bilibili.com/video/BV1gW4y1L7jU/
+<!-- Plugin description end -->
+
+
+## 安装 ⏳
+
+- 插件市场安装: 
+  
+  [安装链接]
+
+- 离线安装包下载
+
+  链接: https://pan.baidu.com/s/10cwt1_qduKwFpE5_6dMGYA 提取码: crst
+
+
+---
+
+[安装链接]: https://plugins.jetbrains.com/plugin/20563-importbeanfield
