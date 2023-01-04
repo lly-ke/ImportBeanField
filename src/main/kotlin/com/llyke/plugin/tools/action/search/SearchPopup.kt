@@ -1,7 +1,6 @@
 package com.llyke.plugin.tools.action.search;
 
 import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider
-import com.intellij.ide.util.gotoByName.ChooseByNameModel
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup
 import com.intellij.ide.util.gotoByName.ChooseByNamePopupComponent
 import com.intellij.openapi.application.ModalityState
@@ -17,7 +16,7 @@ import java.awt.event.KeyEvent
  */
 class SearchPopup(
     project: Project?,
-    model: ChooseByNameModel,
+    private val model: ImportBeanFieldModel,
     provider: ChooseByNameItemProvider,
     oldPopup: ChooseByNamePopup?,
     predefinedText: String?,
@@ -39,6 +38,9 @@ class SearchPopup(
     ) {
         super.initUI(callback, modalityState, allowMultipleSelection)
 
+        myCheckBox.addChangeListener {
+            model.includeClassBySearch = myCheckBox.isSelected
+        }
         textField.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
                 // alt + enter
@@ -62,7 +64,7 @@ class SearchPopup(
     companion object {
         fun createPopup(
             project: Project?,
-            model: ChooseByNameModel,
+            model: ImportBeanFieldModel,
             provider: ChooseByNameItemProvider,
             predefinedText: String?,
             mayRequestOpenInCurrentWindow: Boolean,

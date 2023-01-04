@@ -1,43 +1,39 @@
 package com.llyke.plugin.tools.action.search
 
-import com.intellij.ide.util.gotoByName.*
+import com.intellij.ide.util.gotoByName.ChooseByNameItemProvider
+import com.intellij.ide.util.gotoByName.DefaultChooseByNameItemProvider
+import com.intellij.ide.util.gotoByName.DefaultClassNavigationContributor
+import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.navigation.ChooseByNameContributor
+import com.intellij.navigation.ChooseByNameRegistry
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.llyke.plugin.tools.IBFBundle
-import javax.swing.JCheckBox
 
 class ImportBeanFieldModel(project: Project) :
     GotoSymbolModel2(project), DumbAware {
+
+    var includeClassBySearch: Boolean = false
 
     override fun getItemProvider(context: PsiElement?): ChooseByNameItemProvider {
         return DefaultChooseByNameItemProvider(context)
     }
 
     override fun getContributorList(): MutableList<ChooseByNameContributor> {
-        // todo 暂时找不到对应的接口, 后期换成接口调用
-        val contributorList = project.getUserData(ChooseByNamePopup.CHOOSE_BY_NAME_POPUP_IN_PROJECT_KEY)?.let {
-            val field =
-                Class.forName("com.intellij.ide.util.gotoByName.ChooseByNameBase").getDeclaredField("myCheckBox")
-            field.isAccessible = true
-            val myCheckBox = field.get(it) as JCheckBox
-            if (myCheckBox.isSelected) {
-                mutableListOf<ChooseByNameContributor>(DefaultClassNavigationContributor())
-            } else {
-                mutableListOf<ChooseByNameContributor>()
-            }
-        } ?: mutableListOf<ChooseByNameContributor>()
-
-        try {
-            val clazz = Class.forName("com.intellij.spring.navigation.GotoSpringBeanProvider")
-            val declaredConstructor = clazz.getDeclaredConstructor()
-            declaredConstructor.isAccessible = true
-            contributorList.add(declaredConstructor.newInstance() as ChooseByNameContributor)
-        } catch (e: ClassNotFoundException) {
-            LOG.error("GotoSpringBeanProvider not found")
+        val contributorList = mutableListOf<ChooseByNameContributor>()
+        if (includeClassBySearch) {
+            contributorList.add(DefaultClassNavigationContributor())
         }
 
+        // todo 暂时找不到对应的接口, 后期换成接口调用
+        ChooseByNameRegistry.getInstance().symbolModelContributors.filter { it.javaClass.simpleName == "GotoSpringBeanProvider" }
+            .forEach {
+                LOG.info("找到SpringBeanProvider:$it")
+                contributorList.add(it)
+            }
+
+        LOG.info("最后的contributorList:$contributorList")
         return contributorList
 //        return ExtensionPointName.create<ChooseByNameContributor>("com.llyke.plugin.tools.IBFContributor").extensionList
     }

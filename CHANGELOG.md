@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [2023.1.4]
+
+### Bug Fixes
+
+- 部分平台无法搜索Spring Bean的问题
+
 ## [2022.12.29]
 
 ### Bug Fixes
@@ -51,6 +57,8 @@
 - 完成基本类Java字段添加功能
 
 [Unreleased]: https://github.com/2720851545/ImportBeanField/compare/v2022.12.29...HEAD
+
+[2023.1.4]: https://github.com/2720851545/ImportBeanField
 
 [2022.12.29]: https://github.com/2720851545/ImportBeanField
 
