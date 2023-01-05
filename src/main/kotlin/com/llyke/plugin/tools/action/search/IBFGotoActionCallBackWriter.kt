@@ -4,8 +4,10 @@ import com.intellij.ide.util.gotoByName.ChooseByNamePopup
 import com.intellij.jam.JamPomTarget
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.pom.PomTargetPsiElement
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.PsiJavaFileImpl
@@ -21,6 +23,7 @@ import com.llyke.plugin.tools.dialog.search.RepetitionFieldDialogWrapper
 import com.llyke.plugin.tools.setting.IBFSetting
 import com.llyke.plugin.tools.util.IBFNotifier
 import com.llyke.plugin.tools.util.IdeaUtil
+import org.jetbrains.kotlin.idea.util.ifTrue
 import org.jetbrains.kotlin.psi.KtClassOrObject
 
 
@@ -29,6 +32,9 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
  * @date 2022/12/10 10:04
  */
 class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
+
+    private val psiFile = e.getData(CommonDataKeys.PSI_FILE)
+    private val editor = e.getData(CommonDataKeys.EDITOR)
 
     private val ibfSetting = IBFSetting.getInstance()
 
@@ -92,6 +98,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
         val detectionWriteTargetClass = detectionWriteTargetClass() ?: return
         val project = e.project ?: return
         LOG.info("需要注入的目标类：${detectionWriteTargetClass.qualifiedName}")
+        var fieldName: String? = null;
 
         when (psiType) {
             // 源bean是java类
@@ -106,8 +113,9 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                     return
                 }
 
+                fieldName = transformFieldName(transformPsiType.name)
                 val psiField = psiElementFactory.createField(
-                    transformFieldName(transformPsiType.name), transformPsiType
+                    fieldName, transformPsiType
                 )
                 val modifierList = psiField.modifierList ?: return
                 when (ibfSetting.injectMode) {
@@ -124,6 +132,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                                 WriteCommandAction.runWriteCommandAction(e.project) {
                                     writePackageToJavaFileConsumer?.consume(null)
                                     detectionWriteTargetClass.add(psiField)
+                                    insertFieldNameOnCursor(fieldName!!)
                                 }
                             }
 
@@ -138,6 +147,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                                 WriteCommandAction.runWriteCommandAction(e.project) {
                                     writePackageToJavaFileConsumer?.consume(null)
                                     detectionWriteTargetClass.add(psiField)
+                                    insertFieldNameOnCursor(fieldName!!)
                                 }
                             }
 
@@ -154,6 +164,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                         WriteCommandAction.runWriteCommandAction(e.project) {
                             addAnnotationToClassConsumer?.consume(null)
                             detectionWriteTargetClass.add(psiField)
+                            insertFieldNameOnCursor(fieldName!!)
                         }
                     }
                 }
@@ -165,10 +176,9 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
                 val psiElementFactory: PsiElementFactory = JavaPsiFacade.getElementFactory(project) ?: return
                 val transformPsiType = transformPsiType(psiType)
+                fieldName = transformFieldName(transformPsiType.name!!)
                 val psiField = psiElementFactory.createFieldFromText(
-                    "private ${transformPsiType.name} ${
-                        IdeaUtil.toCamelCase(transformPsiType.name!!)
-                    };", detectionWriteTargetClass
+                    "private ${transformPsiType.name} $fieldName;", detectionWriteTargetClass
                 )
                 val modifierList = psiField.modifierList ?: return
                 modifierList.addAnnotation("Autowired")
@@ -179,6 +189,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                         "org.springframework.beans.factory.annotation.Autowired"
                     )
                     detectionWriteTargetClass.add(psiField)
+                    insertFieldNameOnCursor(fieldName)
                 }
 //                        val transformPsiType = transformPsiType(psiType)
 //                        val ktPsiFactory = KtPsiFactory(project)
@@ -192,6 +203,21 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
             }
         }
 
+    }
+
+    private fun insertFieldNameOnCursor(fieldName: String) {
+        ibfSetting.insertFieldNameOnCursor?.ifTrue {
+            if (editor == null) {
+                return
+            }
+            val caretModel = editor.caretModel
+            editor.document.insertString(caretModel.offset, fieldName)
+            // 异步执行
+            ApplicationManager.getApplication().invokeLater {
+                caretModel.moveToOffset(caretModel.offset + fieldName.length)
+                editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
+            }
+        }
     }
 
     private fun transformFieldName(name: String): String {
@@ -299,8 +325,9 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
     }
 
     private fun detectionWriteTargetClassInner(): PsiClass? {
-        val psiFile = e.getData(CommonDataKeys.PSI_FILE) ?: return null
-        val editor = e.getData(CommonDataKeys.EDITOR) ?: return null
+        if (editor == null || psiFile == null) {
+            return null
+        }
         val targetClass: PsiClass = IdeaUtil.getTargetClassByCursor(editor, psiFile) ?: let {
             // 当前光标找不到并且当前文件只有一个类, 就用当前文件唯一的类
             val psiJavaFile = e.getData(CommonDataKeys.PSI_FILE) as? PsiJavaFileImpl ?: return null
@@ -310,6 +337,11 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
             } else {
                 return null
             }
+        }
+
+        // class不可写返回null
+        if (!targetClass.isWritable) {
+            return null
         }
         return targetClass
     }

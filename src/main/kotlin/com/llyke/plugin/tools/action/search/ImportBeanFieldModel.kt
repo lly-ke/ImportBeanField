@@ -29,11 +29,9 @@ class ImportBeanFieldModel(project: Project) :
         // todo 暂时找不到对应的接口, 后期换成接口调用
         ChooseByNameRegistry.getInstance().symbolModelContributors.filter { it.javaClass.simpleName == "GotoSpringBeanProvider" }
             .forEach {
-                LOG.info("找到SpringBeanProvider:$it")
                 contributorList.add(it)
             }
 
-        LOG.info("最后的contributorList:$contributorList")
         return contributorList
 //        return ExtensionPointName.create<ChooseByNameContributor>("com.llyke.plugin.tools.IBFContributor").extensionList
     }

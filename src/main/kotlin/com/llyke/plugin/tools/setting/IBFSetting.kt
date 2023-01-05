@@ -20,6 +20,7 @@ class IBFSetting : PersistentStateComponent<IBFSetting>, Serializable {
 
     var injectMode: Int? = null
     var fieldInjectMode: Int? = null
+    var insertFieldNameOnCursor: Boolean? = null
 
     companion object {
         @JvmStatic
@@ -27,6 +28,7 @@ class IBFSetting : PersistentStateComponent<IBFSetting>, Serializable {
             val ibfSetting = ApplicationManager.getApplication().getService(IBFSetting::class.java)
             ibfSetting.injectMode = ibfSetting.injectMode ?: 0
             ibfSetting.fieldInjectMode = ibfSetting.fieldInjectMode ?: 0
+            ibfSetting.insertFieldNameOnCursor = ibfSetting.insertFieldNameOnCursor ?: false
             return ibfSetting
         }
     }
@@ -50,6 +52,7 @@ class IBFSetting : PersistentStateComponent<IBFSetting>, Serializable {
             if (configDialogForm.fieldInjectGroup.isSelected(configDialogForm.autowiredFieldInjectRadioButton.model)) 0 else
                 if (configDialogForm.fieldInjectGroup.isSelected(configDialogForm.resourceJavaXFieldInjectRadioButton.model)) 1 else
                     if (configDialogForm.fieldInjectGroup.isSelected(configDialogForm.resourceJakartaFieldInjectRadioButton.model)) 2 else 0
+        insertFieldNameOnCursor = configDialogForm.insertFieldNameOnCursor.isSelected
     }
 
 }

@@ -7,7 +7,7 @@
         &lt;p&gt;&lt;strong&gt;ImportBeanField&lt;/strong&gt; provides the ability to quickly add a Spring bean to the
         current class.&lt;/p&gt;
 
-        &lt;p&gt;source code url &lt;a href="https://github.com/2720851545/ImportBeanField"&gt;source_repo&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;source code url &lt;a href="https://github.com/lly-ke/ImportBeanField"&gt;source_repo&lt;/a&gt;&lt;/p&gt;
     </description>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
@@ -30,6 +30,8 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable groupId="tools"
+                                 instance="com.llyke.plugin.tools.setting.IBFConfigurable"/>
         <applicationService serviceImplementation="com.llyke.plugin.tools.setting.IBFSetting"/>
         <notificationGroup displayType="BALLOON" id="ImportBeanField" icon="/icons/IBF.svg" isLogByDefault="true"/>
         <!--     <searchEverywhereContributor -->

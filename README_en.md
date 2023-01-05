@@ -13,5 +13,5 @@ Mac: `command + shift + i`
 
 Windows: `ctrl + shift + o`
 
-[source_repo]: https://github.com/2720851545/ImportBeanField
+[source_repo]: https://github.com/lly-ke/ImportBeanField
 <!-- Plugin description end -->

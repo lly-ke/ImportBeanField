@@ -23,12 +23,14 @@ public class ConfigDialogForm {
     public JRadioButton autowiredFieldInjectRadioButton;
     public JRadioButton resourceJavaXFieldInjectRadioButton;
     public JRadioButton resourceJakartaFieldInjectRadioButton;
+    public JCheckBox insertFieldNameOnCursor;
     public ButtonGroup injectModeGroup;
     public ButtonGroup fieldInjectGroup;
 
     public ConfigDialogForm() {
         IBFSetting ibfSetting = IBFSetting.getInstance();
 
+        insertFieldNameOnCursor.setSelected(Boolean.TRUE.equals(ibfSetting.getInsertFieldNameOnCursor()));
         Integer injectMode = ibfSetting.getInjectMode();
         if (injectMode != null) {
             switch (injectMode) {

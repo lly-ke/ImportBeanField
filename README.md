@@ -30,7 +30,8 @@ Windows: `alt + enter`
 
 [加入Discord]: https://discord.com/invite/ywjh4dRRvK
 
-[source_repo]: https://github.com/2720851545/ImportBeanField
+[source_repo]: https://github.com/lly-ke/ImportBeanField
+
 [演示视频]: https://www.bilibili.com/video/BV1gW4y1L7jU/
 <!-- Plugin description end -->
 
