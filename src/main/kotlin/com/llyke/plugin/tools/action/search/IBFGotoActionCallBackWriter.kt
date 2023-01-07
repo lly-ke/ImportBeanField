@@ -35,6 +35,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
     private val psiFile = e.getData(CommonDataKeys.PSI_FILE)
     private val editor = e.getData(CommonDataKeys.EDITOR)
+    private val project = e.getData(CommonDataKeys.PROJECT)
 
     private val ibfSetting = IBFSetting.getInstance()
 
@@ -91,14 +92,14 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
     }
 
     private fun writeToJavaField(psiClass: PsiClass) {
-        writeToJavaField(JavaPsiFacade.getInstance(e.project ?: return).elementFactory.createType(psiClass))
+        writeToJavaField(JavaPsiFacade.getInstance(project ?: return).elementFactory.createType(psiClass))
     }
 
     private fun writeToJavaField(psiType: Any) {
         val detectionWriteTargetClass = detectionWriteTargetClass() ?: return
-        val project = e.project ?: return
+        val project = project ?: return
         LOG.info("需要注入的目标类：${detectionWriteTargetClass.qualifiedName}")
-        var fieldName: String? = null;
+        var fieldName = "";
 
         when (psiType) {
             // 源bean是java类
@@ -129,10 +130,10 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                                     detectionWriteTargetClass,
                                     "org.springframework.beans.factory.annotation.Autowired"
                                 )
-                                WriteCommandAction.runWriteCommandAction(e.project) {
+                                WriteCommandAction.runWriteCommandAction(project) {
                                     writePackageToJavaFileConsumer?.consume(null)
                                     detectionWriteTargetClass.add(psiField)
-                                    insertFieldNameOnCursor(fieldName!!)
+                                    insertFieldNameOnCursor(fieldName)
                                 }
                             }
 
@@ -144,10 +145,10 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                                     detectionWriteTargetClass,
                                     annotationName
                                 )
-                                WriteCommandAction.runWriteCommandAction(e.project) {
+                                WriteCommandAction.runWriteCommandAction(project) {
                                     writePackageToJavaFileConsumer?.consume(null)
                                     detectionWriteTargetClass.add(psiField)
-                                    insertFieldNameOnCursor(fieldName!!)
+                                    insertFieldNameOnCursor(fieldName)
                                 }
                             }
 
@@ -161,10 +162,10 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                         psiField.modifierList?.setModifierProperty(PsiModifier.FINAL, true)
                         val addAnnotationToClassConsumer =
                             parseAddAnnotationToClass(detectionWriteTargetClass, "lombok.RequiredArgsConstructor")
-                        WriteCommandAction.runWriteCommandAction(e.project) {
+                        WriteCommandAction.runWriteCommandAction(project) {
                             addAnnotationToClassConsumer?.consume(null)
                             detectionWriteTargetClass.add(psiField)
-                            insertFieldNameOnCursor(fieldName!!)
+                            insertFieldNameOnCursor(fieldName)
                         }
                     }
                 }
@@ -183,7 +184,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                 val modifierList = psiField.modifierList ?: return
                 modifierList.addAnnotation("Autowired")
 
-                WriteCommandAction.runWriteCommandAction(e.project) {
+                WriteCommandAction.runWriteCommandAction(project) {
                     parseAddPackageToJavaFile(
                         detectionWriteTargetClass,
                         "org.springframework.beans.factory.annotation.Autowired"
@@ -191,15 +192,6 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
                     detectionWriteTargetClass.add(psiField)
                     insertFieldNameOnCursor(fieldName)
                 }
-//                        val transformPsiType = transformPsiType(psiType)
-//                        val ktPsiFactory = KtPsiFactory(project)
-//                        val ktProperty =
-//                            ktPsiFactory.createProperty(IdeaUtil.toCamelCase(transformPsiType.name!!))
-//
-//                        ktProperty.addAnnotationEntry(ktPsiFactory.createAnnotationEntry("@Autowired"))
-//                        WriteCommandAction.runWriteCommandAction(e.project) {
-//                            targetClass.add(ktProperty)
-//                        }
             }
         }
 
@@ -207,11 +199,17 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
     private fun insertFieldNameOnCursor(fieldName: String) {
         ibfSetting.insertFieldNameOnCursor?.ifTrue {
-            if (editor == null) {
+            if (editor == null || project == null) {
                 return
             }
             val caretModel = editor.caretModel
+            val document = editor.document
+
+            // 防止 Document is locked by write PSI operations
+            PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
             editor.document.insertString(caretModel.offset, fieldName)
+            PsiDocumentManager.getInstance(project).commitDocument(document)
+
             // 异步执行
             ApplicationManager.getApplication().invokeLater {
                 caretModel.moveToOffset(caretModel.offset + fieldName.length)
@@ -304,7 +302,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
         // 只有一个接口直接用接口来注入
         if (list.size == 1) {
             return JavaPsiFacade.getInstance(
-                e.project ?: return paramPisType
+                project ?: return paramPisType
             ).elementFactory.createType(list[0])
         }
         return paramPisType
@@ -319,7 +317,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
         val res = detectionWriteTargetClassInner()
         if (res == null) {
             LOG.info("请将光标移动到正确的位置, 检测不到写入目标文件")
-            IBFNotifier.notifyInformation(e.project ?: return null, IBFBundle.getMessage("ibf.notifier.error.noClass"))
+            IBFNotifier.notifyInformation(project ?: return null, IBFBundle.getMessage("ibf.notifier.error.noClass"))
         }
         return res
     }

@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [2023.1.7]
+
+### Bug Fixes
+
+- 插入字段名, 数据块检查异常
+
 ## [2023.1.5]
 
 ### Added
@@ -14,13 +20,11 @@
 ## [2022.12.29]
 
 ### Bug Fixes
-
 - Resource注解(Jakarta) 未加入单选框组
 
 ## [2022.12.28]
 
 ### Added
-
 - Lombok构造函数注入
 - 属性注入注解选择
 
@@ -56,7 +60,9 @@
 - 完成基本搜索功能
 - 完成基本类Java字段添加功能
 
-[Unreleased]: https://github.com/lly-ke/ImportBeanField/compare/v2023.1.5...HEAD
+[Unreleased]: https://github.com/lly-ke/ImportBeanField/compare/v2023.1.7...HEAD
+
+[2023.1.7]: https://github.com/lly-ke/ImportBeanField
 
 [2023.1.5]: https://github.com/lly-ke/ImportBeanField
 

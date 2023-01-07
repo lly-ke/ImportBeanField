@@ -28,7 +28,7 @@ class IBFSetting : PersistentStateComponent<IBFSetting>, Serializable {
             val ibfSetting = ApplicationManager.getApplication().getService(IBFSetting::class.java)
             ibfSetting.injectMode = ibfSetting.injectMode ?: 0
             ibfSetting.fieldInjectMode = ibfSetting.fieldInjectMode ?: 0
-            ibfSetting.insertFieldNameOnCursor = ibfSetting.insertFieldNameOnCursor ?: false
+            ibfSetting.insertFieldNameOnCursor = ibfSetting.insertFieldNameOnCursor ?: true
             return ibfSetting
         }
     }
