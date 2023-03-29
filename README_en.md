@@ -3,15 +3,47 @@
 # ImportBeanField
 
 <!-- Plugin description -->
-**ImportBeanField** provides the ability to quickly add a Spring bean to the current class.
+**ImportBeanField** provides a quick way to add Spring Beans to the current class.
 
-source code url  [source_repo]
+Source code repository [source_repo]
 
-## Shortcut Keys
+- 🎥 [Demo video]
 
-Mac: `command + shift + i`
+## Shortcuts
 
-Windows: `ctrl + shift + o`
+### Shortcut to open Bean selection dialog
+
+Mac: `Command + Shift + I`
+
+Windows: `Ctrl + Shift + O`
+
+### Shortcut to open injection settings (only available when Bean selection dialog is active)
+
+Mac: `Option + Enter`
+
+Windows: `Alt + Enter`
+
+## Discussion 📖
+
+- Discord: [Join Discord]
 
 [source_repo]: https://github.com/lly-ke/ImportBeanField
+
+[Demo video]: https://www.youtube.com/watch?v=NSq9Jpm88SE
+
+[Join Discord]: https://discord.com/invite/ywjh4dRRvK
 <!-- Plugin description end -->
+
+## Installation ⏳
+
+- Install from the plugin marketplace:
+
+  [Installation Link]
+
+- Offline installation package download:
+
+  Link: https://pan.baidu.com/s/10cwt1_qduKwFpE5_6dMGYA Extraction code: crst
+
+---
+
+[Installation Link]: https://plugins.jetbrains.com/plugin/20563-importbeanfield

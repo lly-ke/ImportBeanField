@@ -70,7 +70,9 @@ tasks {
     patchPluginXml {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
+        // untilBuild.set(properties("pluginUntilBuild"))
+        // 后续所有版本可用
+        untilBuild.set("")
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(
