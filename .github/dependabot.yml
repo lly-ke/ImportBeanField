@@ -1,0 +1,9 @@
+version: 2  # Dependabot 配置文件的版本号，当前为版本2。
+
+updates:
+  # 维护 Gradle 依赖项的更新
+  - package-ecosystem: "gradle"  # 指定要更新的依赖项的类型，这里为 Gradle。
+    directory: "/"  # 指定要更新的依赖项所在的目录。这里为根目录。
+    #    target-branch: "next"  # 指定在哪个分支上提交更新后的代码。这里为“next”分支。
+    schedule:
+      interval: "daily"  # 指定更新依赖项的频率。这里为每天更新一次。

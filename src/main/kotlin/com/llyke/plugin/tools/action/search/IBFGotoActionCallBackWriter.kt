@@ -17,14 +17,14 @@ import com.intellij.psi.util.JavaElementKind
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.spring.model.jam.JamPsiClassSpringBean
 import com.intellij.util.Consumer
-import com.intellij.util.alsoIfNull
+import com.intellij.util.xml.model.gotosymbol.GoToSymbolProvider
 import com.llyke.plugin.tools.IBFBundle
 import com.llyke.plugin.tools.dialog.search.RepetitionFieldDialogWrapper
 import com.llyke.plugin.tools.setting.IBFSetting
 import com.llyke.plugin.tools.util.IBFNotifier
 import com.llyke.plugin.tools.util.IdeaUtil
-import org.jetbrains.kotlin.idea.util.ifTrue
 import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 
 /**
@@ -43,7 +43,9 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
         val LOG = logger<IBFGotoActionCallBackWriter>()
     }
 
-    fun elementChosen(chooseByNamePopup: ChooseByNamePopup?, o: Any?) {
+    fun elementChosen(chooseByNamePopup: ChooseByNamePopup?, element: Any?) {
+        // element是GoToSymbolProvider.BaseNavigationItem子类
+        val o = (element as? GoToSymbolProvider.BaseNavigationItem)?.navigationElement ?: element
         LOG.info("选择的元素是：$o")
         when (o) {
             is PsiClass -> {
@@ -258,7 +260,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
         for (psiImportList in psiImportListArray) {
             var psiImportStatement =
                 psiImportList.findSingleClassImportStatement(annotationName)
-            psiImportStatement.alsoIfNull {
+            if (psiImportStatement == null) {
                 psiImportStatement =
                     psiImportList.findOnDemandImportStatement(annotationName.substringBefore(".", annotationName))
             }
