@@ -206,15 +206,17 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
             }
             val caretModel = editor.caretModel
             val document = editor.document
+            val selectionModel = editor.selectionModel
 
             // 防止 Document is locked by write PSI operations
             PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-            editor.document.insertString(caretModel.offset, fieldName)
+            editor.document.replaceString(selectionModel.selectionStart, selectionModel.selectionEnd, fieldName)
             PsiDocumentManager.getInstance(project).commitDocument(document)
 
             // 异步执行
             ApplicationManager.getApplication().invokeLater {
-                caretModel.moveToOffset(caretModel.offset + fieldName.length)
+                caretModel.moveToOffset(selectionModel.selectionStart + fieldName.length)
+                selectionModel.removeSelection()
                 editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
             }
         }
