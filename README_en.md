@@ -36,6 +36,8 @@ Windows: `Alt + Enter`
 
 ## Installation ⏳
 
+> Note: Starting with version 2023.5.2, only IntelliJ IDEA 2023.1.1 and above are supported (only jdk17 runtime)
+
 - Install from the plugin marketplace:
 
   [Installation Link]

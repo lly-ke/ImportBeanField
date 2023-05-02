@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+## [2023.5.2]
+
+### Added
+
+- 兼容IDEA 2023.1.1
+- 多光标替换
+
 ## [2023.3.29]
 
 ### Added
@@ -19,7 +26,6 @@
 ## [2023.1.5]
 
 ### Added
-
 - 配置在光标位置插入字段
 - Preferences 添加配置项
 
@@ -66,7 +72,9 @@
 - 完成基本搜索功能
 - 完成基本类Java字段添加功能
 
-[Unreleased]: https://github.com/lly-ke/ImportBeanField/compare/v2023.3.29...HEAD
+[Unreleased]: https://github.com/lly-ke/ImportBeanField/compare/v2023.5.2...HEAD
+
+[2023.5.2]: https://github.com/lly-ke/ImportBeanField/compare/v2023.3.29...v2023.5.2
 
 [2023.3.29]: https://github.com/lly-ke/ImportBeanField/compare/v2023.1.7...v2023.3.29
 

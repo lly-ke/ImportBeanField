@@ -210,7 +210,13 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
 
             // 防止 Document is locked by write PSI operations
             PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-            editor.document.replaceString(selectionModel.selectionStart, selectionModel.selectionEnd, fieldName)
+            for (i in selectionModel.blockSelectionStarts.indices) {
+                editor.document.replaceString(
+                    selectionModel.blockSelectionStarts[i],
+                    selectionModel.blockSelectionEnds[i],
+                    fieldName
+                )
+            }
             PsiDocumentManager.getInstance(project).commitDocument(document)
 
             // 异步执行

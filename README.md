@@ -35,17 +35,17 @@ Windows: `alt + enter`
 [演示视频]: https://www.bilibili.com/video/BV1gW4y1L7jU/
 <!-- Plugin description end -->
 
-
 ## 安装 ⏳
 
-- 插件市场安装: 
-  
+> 注意: 2023.5.2 版本开始, 仅支持IntelliJ IDEA 2023.1.1 及以上版本(only jdk17 runtime)
+
+- 插件市场安装:
+
   [安装链接]
 
 - 离线安装包下载
 
   链接: https://pan.baidu.com/s/10cwt1_qduKwFpE5_6dMGYA 提取码: crst
-
 
 ---
 
