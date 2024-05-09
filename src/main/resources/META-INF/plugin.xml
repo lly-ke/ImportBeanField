@@ -34,10 +34,10 @@
                                  instance="com.llyke.plugin.tools.setting.IBFConfigurable"/>
         <applicationService serviceImplementation="com.llyke.plugin.tools.setting.IBFSetting"/>
         <notificationGroup displayType="BALLOON" id="ImportBeanField" icon="/icons/IBF.svg" isLogByDefault="true"/>
-        <!--     <searchEverywhereContributor -->
-        <!--             implementation="com.llyke.plugin.tools.action.search.ImportBeanFieldSearchGotoSEContributor$Factory"/> -->
-        <!--     <searchEverywhereResultsEqualityProvider -->
-        <!--             implementation="com.llyke.plugin.tools.action.search.IBFResultsEqualityProvider"/> -->
+        <searchEverywhereContributor
+                implementation="com.llyke.plugin.tools.action.search.ImportBeanFieldSearchGotoSEContributor$Factory"/>
+        <!--        <searchEverywhereResultsEqualityProvider-->
+        <!--                implementation="com.llyke.plugin.tools.action.search.IBFResultsEqualityProvider"/>-->
     </extensions>
     <!--     <extensionPoints>-->
     <!--         <extensionPoint name="IBFContributor" interface="com.intellij.navigation.ChooseByNameContributor" dynamic="true"/>-->

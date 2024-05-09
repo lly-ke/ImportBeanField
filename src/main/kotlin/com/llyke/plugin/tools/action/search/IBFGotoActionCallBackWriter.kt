@@ -1,6 +1,5 @@
 package com.llyke.plugin.tools.action.search
 
-import com.intellij.ide.util.gotoByName.ChooseByNamePopup
 import com.intellij.jam.JamPomTarget
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -43,8 +42,7 @@ class IBFGotoActionCallBackWriter(private val e: AnActionEvent) {
         val LOG = logger<IBFGotoActionCallBackWriter>()
     }
 
-    fun elementChosen(chooseByNamePopup: ChooseByNamePopup?, element: Any?) {
-        // element是GoToSymbolProvider.BaseNavigationItem子类
+    fun elementChosen(element: Any) {
         val o = (element as? GoToSymbolProvider.BaseNavigationItem)?.navigationElement ?: element
         LOG.info("选择的元素是：$o")
         when (o) {

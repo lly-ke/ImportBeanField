@@ -6,13 +6,15 @@ import com.intellij.ide.util.gotoByName.DefaultClassNavigationContributor
 import com.intellij.ide.util.gotoByName.GotoSymbolModel2
 import com.intellij.navigation.ChooseByNameContributor
 import com.intellij.navigation.ChooseByNameRegistry
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.llyke.plugin.tools.IBFBundle
+import com.llyke.plugin.tools.setting.IBFSetting
 
-class ImportBeanFieldModel(project: Project) :
-    GotoSymbolModel2(project), DumbAware {
+class ImportBeanFieldModel(project: Project, parentDisposable: Disposable) :
+    GotoSymbolModel2(project, parentDisposable), DumbAware {
 
     var includeClassBySearch: Boolean = false
 
@@ -22,7 +24,7 @@ class ImportBeanFieldModel(project: Project) :
 
     override fun getContributorList(): MutableList<ChooseByNameContributor> {
         val contributorList = mutableListOf<ChooseByNameContributor>()
-        if (includeClassBySearch) {
+        if (IBFSetting.getInstance().includeClassBySearch == true) {
             contributorList.add(DefaultClassNavigationContributor())
         }
 

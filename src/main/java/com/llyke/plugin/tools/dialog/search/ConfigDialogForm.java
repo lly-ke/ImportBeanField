@@ -24,6 +24,7 @@ public class ConfigDialogForm {
     public JRadioButton resourceJavaXFieldInjectRadioButton;
     public JRadioButton resourceJakartaFieldInjectRadioButton;
     public JCheckBox insertFieldNameOnCursor;
+    public JCheckBox includeClassBySearch;
     public ButtonGroup injectModeGroup;
     public ButtonGroup fieldInjectGroup;
 
@@ -31,6 +32,7 @@ public class ConfigDialogForm {
         IBFSetting ibfSetting = IBFSetting.getInstance();
 
         insertFieldNameOnCursor.setSelected(Boolean.TRUE.equals(ibfSetting.getInsertFieldNameOnCursor()));
+        includeClassBySearch.setSelected(Boolean.TRUE.equals(ibfSetting.getIncludeClassBySearch()));
         Integer injectMode = ibfSetting.getInjectMode();
         if (injectMode != null) {
             switch (injectMode) {

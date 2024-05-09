@@ -7,15 +7,15 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.9.10"
+    id("org.jetbrains.kotlin.jvm") version "1.9.23"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("org.jetbrains.intellij") version "1.17.2"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.2.0"
     // Gradle Qodana Plugin
-    id("org.jetbrains.qodana") version "0.1.13"
+    id("org.jetbrains.qodana") version "2023.3.1"
     // Gradle Kover Plugin
-    id("org.jetbrains.kotlinx.kover") version "0.7.3"
+    id("org.jetbrains.kotlinx.kover") version "0.7.6"
 }
 
 group = properties("pluginGroup")
@@ -50,12 +50,12 @@ changelog {
 }
 
 // Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
-qodana {
-    cachePath.set(file(".qodana").canonicalPath)
-    reportPath.set(file("build/reports/inspections").canonicalPath)
-    saveReport.set(true)
-    showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
-}
+// qodana {
+//     cachePath.set(file(".qodana").canonicalPath)
+//     reportPath.set(file("build/reports/inspections").canonicalPath)
+//     saveReport.set(true)
+//     showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
+// }
 
 // Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
 koverReport {

@@ -1,6 +1,5 @@
 package org.jetbrains.plugins.template
 
-import com.jetbrains.rd.util.string.printToString
 import com.llyke.plugin.tools.util.IdeaUtil
 import org.junit.Test
 

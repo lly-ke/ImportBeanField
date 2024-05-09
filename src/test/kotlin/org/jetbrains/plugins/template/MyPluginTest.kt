@@ -1,16 +1,7 @@
 package org.jetbrains.plugins.template
 
-import com.intellij.ide.highlighter.XmlFileType
-import com.intellij.psi.PsiType
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.xml.XmlFile
 import com.intellij.testFramework.TestDataPath
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import com.intellij.util.PsiErrorElementUtil
-import com.jetbrains.rd.util.string.PrettyPrinter
-import com.jetbrains.rd.util.string.printToString
-import com.jetbrains.rd.util.string.println
-import org.junit.Test
 
 @TestDataPath("\$CONTENT_ROOT/src/test/testData")
 class MyPluginTest : BasePlatformTestCase() {
